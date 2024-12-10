@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 import { NOSQL } from 'Database';
-import TelegramBot, { CallbackQuery, Message } from 'node-telegram-bot-api';
+import TelegramBot, { CallbackQuery, Message, SendMessageOptions } from 'node-telegram-bot-api';
 import NodeCache from 'node-cache';
 import { bot } from 'main.bot';
 
@@ -160,6 +160,80 @@ export class Bot {
     }
 
  
+
+
+    private async demoproductsCommand(msg: Message) {
+        const welcomeMessage = `✨ Welcome!\n\nVia this bot, you can purchase Telegram stars without KYC verification and cheaper than in the app.\n\n❗️Enter the number of stars you want to buy to continue (minimum: 50 stars):`;
+    
+        // Send welcome message with inline buttons and force reply
+        const sentMessage  = await this.bot.sendMessage(msg.chat.id, welcomeMessage, {
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: "⭐️ Buy Stars", callback_data: "view_products" }, backButton[0]],
+                ],
+                force_reply : true
+            },
+              
+        });
+    
+        // Listen for the reply
+        const replyListener = this.bot.onReplyToMessage(
+            sentMessage.chat.id,
+            sentMessage.message_id,
+            async (reply) => {
+                const stars = parseInt(reply.text || "0", 10);
+    
+                // Validate user input
+                if (isNaN(stars) || stars < 50) {
+                    this.bot.sendMessage(msg.chat.id, "⚠️ Please enter a valid number of stars (minimum: 50).");
+                    return;
+                }
+    
+                try {
+                    // Fetch TON price in USD
+                    const tonPrice = await fetchTonPrice();
+                    if (!tonPrice) {
+                        this.bot.sendMessage(msg.chat.id, "⚠️ Unable to fetch TON price. Please try again later.");
+                        return;
+                    }
+    
+                    const costPerStarUSD = 0.018;
+                    const costPerStar = costPerStarUSD / tonPrice;
+                    const totalCost = stars * costPerStar;
+    
+                    // Fetch user and process the purchase
+                    const user = await NOSQL.User.findOne({ telegramId: String(msg.chat?.id) });
+                    if (!user) {
+                        this.bot.sendMessage(msg.chat.id, "⚠️ You are not registered. Please restart the bot with /start.");
+                        return;
+                    }
+    
+                    // Add purchase record to the user
+                     
+                    await user.save();
+    
+                    // Send invoice with payment URL
+                    await this.sendInvoiceWithPayUrl(
+                        msg.chat.id,
+                        msg.chat.username as string,
+                        stars,
+                        totalCost,
+                        "TON",
+                        getRandomWallet(wallets),
+                        msg.chat.id
+                    );
+    
+                } catch (error) {
+                    this.bot.sendMessage(msg.chat.id, "⚠️ An error occurred while processing your request. Please try again later.");
+                    console.error("Error in processing purchase:", error);
+                } finally {
+                    // Remove listener after processing
+                    this.bot.removeReplyListener(replyListener);
+                }
+            }
+        );
+    }
+    
 
 
 
@@ -325,38 +399,47 @@ export class Bot {
 
     private async showInvoiceHistory(msg: Message) {
         // Example invoice data (this can be fetched from a database)
-        const invoices = [
-            {
-                id: "INV12345",
-                date: "2024-12-09",
-                amount: "$50.00",
-                status: "Paid",
-                description: "Subscription for December"
-            },
-            {
-                id: "INV12346",
-                date: "2024-11-25",
-                amount: "$75.00",
-                status: "Unpaid",
-                description: "Product Purchase"
-            }
-        ];
-
+        const invoices = await this.NOSQL.Invoice.find({ chatId: msg.chat.id });
+      
         // Create inline keyboard buttons for each invoice
-        const invoiceKeyboard = invoices.map(invoice => [
-            {
-                text: `Invoice ${invoice.id} - ${invoice.amount} (${invoice.status})`,
-                callback_data: `invoice_${invoice.id}`
+        const invoiceKeyboard = invoices.map((invoice) => {
+            let statusEmoji = '';
+            
+            // Add emojis based on the invoice status
+            switch (invoice.status) {
+                case 'paid':
+                    statusEmoji = '✅'; // Green check for paid invoices
+                    break;
+                case 'pending':
+                    statusEmoji = '⏳'; // Hourglass for pending invoices
+                    break;
+                case 'cancelled':
+                    statusEmoji = '❌'; // Cross for cancelled invoices
+                    break;
+                default:
+                    statusEmoji = '⚪'; // Default (neutral) emoji
             }
-        ]);
-
+    
+            return {
+                text: `🌟 ${invoice.quantity} ${statusEmoji}`,
+                callback_data: `invoice_${invoice.id}`,
+            };
+        });
+    
+        // Add the back button
+        const keyboard = [
+            ...invoiceKeyboard, // Append the invoice buttons
+           
+        ];
+    
         // Send the invoice list with buttons to the user
         this.bot.sendMessage(msg.chat.id, "Here is your invoice history:", {
             reply_markup: {
-                inline_keyboard: invoiceKeyboard,
-            }
+                inline_keyboard: [keyboard  ,  backButton ], // Wrap the entire keyboard in an array
+            },
         });
     }
+    
 
 
 
@@ -422,9 +505,7 @@ export class Bot {
         // Retrieve user data from your database or session
         const userId = msg.chat.id;  // Telegram user ID
         const user = await NOSQL.User.findOne({ telegramId: userId });
-
-        console.log(user);
-
+ 
         // If the user does not exist in the database
         if (!user) {
             this.bot.sendMessage(msg.chat.id, "Sorry, we couldn't find your account. Please register first.");
@@ -517,12 +598,12 @@ export class Bot {
         }
         if (data === 'view_products') {
             await this.deleteMessage(msg as any)
-            await this.productsCommand(msg as any)
+            await this.demoproductsCommand(msg as any)
         }
 
         if (data.startsWith('invoice_')) {
             const invoiceId = data.split('_')[1];  // Extract invoice ID
-            await this.showInvoiceDetails(msg as any, invoiceId);
+            await this.showInvoiceHistory(msg as any );
         }
 
         
