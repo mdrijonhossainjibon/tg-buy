@@ -8,7 +8,7 @@ import './cron';
 config();
 
 
-const mongoURI = 'mongodb://localhost:27017/tg-star';
+const mongoURI = 'mongodb://127.0.0.1:27017/tg-star';
 
 mongoose.connect(mongoURI).then(() => {
     console.log('Database connected');
@@ -16,11 +16,7 @@ mongoose.connect(mongoURI).then(() => {
 }).catch((err) => console.error('Database connection error:', err));
 
 
-const walletAddress = 'UQC9iB-II08-TibX2pFXxd_M-FAMhavwKVeJnGStPsJ6BRpE';
-
-
  
-
 
 function convertToTON(usdAmount : number, tonPrice : number) {
     // Calculate the amount of TON
