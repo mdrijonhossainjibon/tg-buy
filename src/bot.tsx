@@ -244,7 +244,7 @@ export class Bot {
         // Send welcome message and prompt for star purchase
         const welcomeMessage = `✨ Welcome!\n\nVia this bot you can purchase Telegram stars without KYC verification and cheaper than in the app.\n\n❗️Enter the number of stars you want to buy to continue (minimum: 50 stars):`;
         const sentMessage = await this.bot.sendMessage(msg.chat.id, welcomeMessage, {
-            reply_to_message_id : msg.message_id, reply_markup : { inline_keyboard :  [ backButton ] , force_reply : true }
+            reply_to_message_id : msg.message_id, reply_markup : { inline_keyboard :  [ [{ text: "⭐️ Buy Stars", callback_data: "view_products" } , backButton[0] ] ] , force_reply : true }
         });
 
 
