@@ -771,8 +771,16 @@ Invite people and get *10%* of our income *FOREVER*! 🎉
             const user = await this.NOSQL.User.findOne({ telegramId :  chatId });
             const count= await this.NOSQL.User.countDocuments({ referrals_uid : chatId});
             if(!user) return;
-            const message = this.generateAffiliateMessage(`https://t.me/Star_buying_bot?start=${chatId}`,count as any,user.balance ,user.balance,10);
+            const message = this.generateAffiliateMessage(`https://t.me/Star_buying_bot?start=${chatId}`,count as any,user.balance ,user.balance,0.5);
             this.sendAffiliateMessage(chatId,message)
+        }
+
+        if (data === 'withdraw') {
+            bot.answerCallbackQuery(query.id, {
+                text: "💸 Withdraw soon",
+                show_alert: true, // Set to true if you want it to be a popup alert
+            });
+            
         }
 
 
