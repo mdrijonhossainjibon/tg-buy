@@ -4,6 +4,7 @@ import { NOSQL } from 'Database';
 import TelegramBot, { CallbackQuery, Message, SendMessageOptions } from 'node-telegram-bot-api';
 import NodeCache from 'node-cache';
 import { bot } from 'main.bot';
+import { API_CALL } from 'API_CALL';
 
 interface BinancePriceResponse {
     symbol: string;
@@ -23,13 +24,13 @@ const fetchTonPrice = async (): Promise<number | null> => {
 
     try {
         // Fetch the price from Binance API
-        const response = await axios.get<BinancePriceResponse>('https://api.binance.com/api/v3/ticker/price', {
-            params: { symbol: 'TONUSDT' },
-        });
+        
 
+        const { response  } = await  API_CALL({ baseURL : 'https://api.binance.com/api/v3/ticker/price' , params : { symbol: 'TONUSDT' }})
         // Parse the price and cache it
-        const price = parseFloat(response.data.price);
-        cache.set('TON_PRICE', price);
+        const price = parseFloat(response?.price as any);
+         cache.set('TON_PRICE', price)
+       
         console.log('Fetched new TON price from Binance.');
         return price;
     } catch (error) {
@@ -37,6 +38,8 @@ const fetchTonPrice = async (): Promise<number | null> => {
         return null;
     }
 }
+
+ 
 
 // List of wallet addresses
 const wallets = [
