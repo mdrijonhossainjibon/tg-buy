@@ -769,8 +769,9 @@ Invite people and get *10%* of our income *FOREVER*! 🎉
         if (data === 'manage_affiliate_program') {
             await this.deleteMessage(msg as any);
             const user = await this.NOSQL.User.findOne({ telegramId :  chatId });
+            const count= await this.NOSQL.User.countDocuments({ referrals_uid : chatId});
             if(!user) return;
-            const message = this.generateAffiliateMessage(`https://t.me/StarsovBot?start=${chatId}`,'100',user.balance ,user.balance,10);
+            const message = this.generateAffiliateMessage(`https://t.me/Star_buying_bot?start=${chatId}`,count as any,user.balance ,user.balance,10);
             this.sendAffiliateMessage(chatId,message)
         }
 
