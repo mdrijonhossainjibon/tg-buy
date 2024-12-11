@@ -8,48 +8,51 @@ import { bot } from 'main.bot';
 interface BinancePriceResponse {
     symbol: string;
     price: string;
-  }
+}
 
-  // Initialize cache with a TTL (time-to-live) of 60 seconds
+// Initialize cache with a TTL (time-to-live) of 60 seconds
 const cache = new NodeCache({ stdTTL: 60 });
 
-  const fetchTonPrice = async (): Promise<number | null> => {
+const fetchTonPrice = async (): Promise<number | null> => {
     // Check if the price is already cached
     const cachedPrice = cache.get<number>('TON_PRICE');
     if (cachedPrice) {
-      console.log('Returning cached TON price.');
-      return cachedPrice;
+        console.log('Returning cached TON price.');
+        return cachedPrice;
     }
-  
+
     try {
-      // Fetch the price from Binance API
-      const response = await axios.get<BinancePriceResponse>('https://api.binance.com/api/v3/ticker/price', {
-        params: { symbol: 'TONUSDT' },
-      });
-  
-      // Parse the price and cache it
-      const price = parseFloat(response.data.price);
-      cache.set('TON_PRICE', price);
-      console.log('Fetched new TON price from Binance.');
-      return price;
+        // Fetch the price from Binance API
+        const response = await axios.get<BinancePriceResponse>('https://api.binance.com/api/v3/ticker/price', {
+            params: { symbol: 'TONUSDT' },
+        });
+
+        // Parse the price and cache it
+        const price = parseFloat(response.data.price);
+        cache.set('TON_PRICE', price);
+        console.log('Fetched new TON price from Binance.');
+        return price;
     } catch (error) {
-      console.error('Error fetching TON price:', (error as Error).message);
-      return null;
+        console.error('Error fetching TON price:', (error as Error).message);
+        return null;
     }
-  }
+}
 
 // List of wallet addresses
 const wallets = [
-    'UQC9iB-II08-TibX2pFXxd_M-FAMhavwKVeJnGStPsJ6BRpE',
+    // 'UQC9iB-II08-TibX2pFXxd_M-FAMhavwKVeJnGStPsJ6BRpE',
+    'UQAJXBGx4yyVl6cEz6pHERPl834z52NQatIciWL8JZkMz0HM'
 ];
 
+
+
 // Function to randomly select a wallet
-function getRandomWallet(wallets : any[]) {
+function getRandomWallet(wallets: any[]) {
     const randomIndex = Math.floor(Math.random() * wallets.length); // Generate random index
     return wallets[randomIndex]; // Return wallet at the random index
 }
- 
 
+const adminUserIds = [709148502, 987654321];
 
 const backButton = [
     {
@@ -58,28 +61,85 @@ const backButton = [
     }
 ];
 
+function isAdmin(userId: number) {
+    return adminUserIds.includes(userId);
+}
 
-// bot.sendMessage( '709148502', `Approve transfer?  To:   @mdrijonhossainjibon   Amount: ⭐️ 500` ,{  reply_markup :  { inline_keyboard: [
-//     [
-//       { text: '✅ Approve', callback_data: `approve_${'transferId'}` },
-//       { text: '❌ Reject', callback_data: `reject_${'transferId'}` }
-//     ]
-//   ]} })   
-//   bot.sendMessage(709148502, "Your transfer request has been sent for admin approval.");
 
-   
- 
-  
+const adminOptions = [
+    [
+        { text: '💰 Manage Star Packages', callback_data: 'manage_stars' },
+        { text: '👥 Manage Users', callback_data: 'manage_users' },
+        { text: '📈 View User Activity', callback_data: 'view_user_activity' },
+    ],
+    [
+        { text: '💸 View Earnings', callback_data: 'view_earnings' },
+        { text: '⚙️ Bot Settings', callback_data: 'bot_settings' },
+        { text: '📊 Bot Stats', callback_data: 'bot_stats' },
+    ],
+    [
+        { text: '📄 User Reports', callback_data: 'user_reports' },
+        { text: '📝 Manage Bot Commands', callback_data: 'manage_commands' },
+        { text: '⏰ Scheduled Messages', callback_data: 'scheduled_messages' },
+    ],
+    [
+        { text: '🚫 Ban/Unban Users', callback_data: 'ban_unban_users' },
+        { text: '🎨 Manage Bot Theme', callback_data: 'manage_theme' },
+        { text: '💾 Data Backup and Restore', callback_data: 'data_backup_restore' },
+    ],
+    [
+        { text: '🪙 Wallet Address Management', callback_data: 'wallet_address_management' },
+        { text: '💳 Payment Gateway Management', callback_data: 'payment_gateway_management' },
+
+    ],
+    [
+        { text: '💳 Manage Payment History', callback_data: 'payment_history' },
+        { text: '✅ Approve/Reject Transactions', callback_data: 'approve_reject_transactions' },
+        { text: '🔒 Fraud Detection', callback_data: 'fraud_detection' },
+    ],
+    [
+        { text: '📑 Generate Reports', callback_data: 'generate_reports' },
+        { text: '🧑‍💼 Admin Access Logs', callback_data: 'admin_access_logs' },
+        { text: '👨‍💼 Create New Admins', callback_data: 'create_new_admins' },
+    ],
+    [
+        { text: '🚫 User Banning History', callback_data: 'user_banning_history' },
+        { text: '🎁 Manage Promotions & Discounts', callback_data: 'manage_promotions' },
+        { text: '💵 Manage Withdrawals', callback_data: 'manage_withdrawals' },
+    ],
+    [
+        { text: '📊 Transaction Reports', callback_data: 'transaction_reports' },
+        { text: '📝 Bot Logs', callback_data: 'bot_logs' },
+        { text: '🔄 Manage Subscriptions', callback_data: 'manage_subscriptions' },
+    ],
+    [
+        { text: '📝 Manage User Feedback', callback_data: 'manage_feedback' },
+        { text: '🔔 Manage Notifications', callback_data: 'manage_notifications' },
+        { text: '🏆 Manage User Levels/Rankings', callback_data: 'manage_user_levels' },
+    ],
+    [
+        { text: '🔗 Manage Affiliate Program', callback_data: 'manage_affiliate_program' },
+        { text: '🖥️ System Health Check', callback_data: 'system_health_check' },
+        { text: '🔄 Bot Updates', callback_data: 'bot_updates' },
+    ],
+    [
+        { text: '🔙 Back to Main Menu', callback_data: 'back_to_main' }
+    ]
+];
+
+
+
+
 
 export class Bot {
     private bot = bot
     private NOSQL = NOSQL
 
-    constructor( ) {
-       this.NOSQL = NOSQL
-     this.initializeCommands();
+    constructor() {
+        this.NOSQL = NOSQL
+        this.initializeCommands();
     }
-    
+
     private initializeCommands() {
         this.bot.onText(/\/start(?: (.+))?/, this.startCommand.bind(this));
         this.bot.onText(/\/referral/, this.referralCommand.bind(this));
@@ -88,12 +148,12 @@ export class Bot {
         this.bot.onText(/\/withdraw/, this.withdrawCommand.bind(this));
         this.bot.onText(/\/buy_stars/, this.buyStarsCommand.bind(this)); // New command
         this.bot.on('callback_query', this.handleCallbackQuery.bind(this));
-        this.bot.on('message',this.handleMessage.bind(this));
+        this.bot.on('message', this.handleMessage.bind(this));
         this.getBotUserame();
     }
- 
-    public sendMessage (chatid: TelegramBot.ChatId, text: string,options? : TelegramBot.SendMessageOptions){
-        this.bot.sendMessage(chatid , text, options);
+
+    public sendMessage(chatid: TelegramBot.ChatId, text: string, options?: TelegramBot.SendMessageOptions) {
+        this.bot.sendMessage(chatid, text, options);
     }
     private async buyStarsCommand(msg: Message) {
         const chatId = msg.chat.id;
@@ -121,7 +181,7 @@ export class Bot {
                         const memo = Math.floor(Math.random() * 1e10); // Generate a unique memo ID
 
                         // Send invoice message
-                         await this.sendInvoiceWithPayUrl(chatId, msg.from?.username || 'user', stars, totalCost, network, address, memo);
+                        await this.sendInvoiceWithPayUrl(chatId, msg.from?.username || 'user', stars, totalCost, network, address, memo);
                     } else {
                         this.bot.sendMessage(chatId, '⚠️ You are not registered. Please restart the bot with /start.');
                     }
@@ -133,7 +193,7 @@ export class Bot {
     }
 
 
-     private convertToTON(usdAmount : number, tonPrice : number) {
+    private convertToTON(usdAmount: number, tonPrice: number) {
         // Calculate the amount of TON
         const tonAmount = usdAmount / tonPrice;
         return tonAmount;
@@ -142,8 +202,15 @@ export class Bot {
     private async sendInvoiceWithPayUrl(chatId: number, username: string | undefined, stars: number, amount: number, network: "TON", address: string, memo: number) {
         // Constructing the TON payment URL
         const totalCostNanoTON = Number(amount * 1e9).toFixed(0); // Convert nanoTON to TON with 9 decimals
- 
+
         const tonUrl = `ton://transfer/${address}?amount=${totalCostNanoTON}&text=${memo}`;
+        const maxStarsLimit = 10000;
+
+        if (stars > maxStarsLimit) {
+            const errorMessage = `⚠️ You can purchase a maximum of ${maxStarsLimit} Stars at a time. Please adjust the quantity and try again.`;
+            await this.bot.sendMessage(chatId, errorMessage, { parse_mode: 'Markdown' });
+            return;
+        }
 
         const message = `@${username}, the invoice is valid for 30 minutes ⏳\n\n` +
             `${stars} Stars ⭐️ for the account @${username} ✨\n\n` +
@@ -154,41 +221,41 @@ export class Bot {
             `Add comment (memo) to transaction \`${memo}\` ✏️\n\n` +  // Monospace for the memo with pencil emoji
             `‼️ Send the exact (!) amount to the specified address. ⚠️ Be sure to include a comment when transferring, otherwise, the payment will not be successful. ❌\n\n` +
             `If you have any problems, please contact support 📞.`;
-            await this.bot.sendMessage(chatId, message, { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ url: tonUrl, text: '👉 Pay In App' }, { text: '↩️ Return', callback_data: 'main_menu' }]] } });
-             await this.NOSQL.Invoice.create({ chatId ,   quantity : stars ,  totalPrice : totalCostNanoTON , address , username });
-             
+        await this.bot.sendMessage(chatId, message, { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ url: tonUrl, text: '👉 Pay In App' }, { text: '↩️ Return', callback_data: 'main_menu' }]] } });
+        await this.NOSQL.Invoice.create({ chatId, quantity: stars, totalPrice: totalCostNanoTON, address, username });
+
     }
 
- 
+
 
 
     private async demoproductsCommand(msg: Message) {
         const welcomeMessage = `✨ Welcome!\n\nVia this bot, you can purchase Telegram stars without KYC verification and cheaper than in the app.\n\n❗️Enter the number of stars you want to buy to continue (minimum: 50 stars):`;
-    
+
         // Send welcome message with inline buttons and force reply
-        const sentMessage  = await this.bot.sendMessage(msg.chat.id, welcomeMessage, {
+        const sentMessage = await this.bot.sendMessage(msg.chat.id, welcomeMessage, {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: "⭐️ Buy Stars", callback_data: "view_products" }, backButton[0]],
                 ],
-                force_reply : true
+                force_reply: true
             },
-              
+
         });
-    
+
         // Listen for the reply
         const replyListener = this.bot.onReplyToMessage(
             sentMessage.chat.id,
             sentMessage.message_id,
             async (reply) => {
                 const stars = parseInt(reply.text || "0", 10);
-    
+
                 // Validate user input
                 if (isNaN(stars) || stars < 50) {
                     this.bot.sendMessage(msg.chat.id, "⚠️ Please enter a valid number of stars (minimum: 50).");
                     return;
                 }
-    
+
                 try {
                     // Fetch TON price in USD
                     const tonPrice = await fetchTonPrice();
@@ -196,22 +263,22 @@ export class Bot {
                         this.bot.sendMessage(msg.chat.id, "⚠️ Unable to fetch TON price. Please try again later.");
                         return;
                     }
-    
+
                     const costPerStarUSD = 0.018;
                     const costPerStar = costPerStarUSD / tonPrice;
                     const totalCost = stars * costPerStar;
-    
+
                     // Fetch user and process the purchase
                     const user = await NOSQL.User.findOne({ telegramId: String(msg.chat?.id) });
                     if (!user) {
                         this.bot.sendMessage(msg.chat.id, "⚠️ You are not registered. Please restart the bot with /start.");
                         return;
                     }
-    
+
                     // Add purchase record to the user
-                     
+
                     await user.save();
-    
+
                     // Send invoice with payment URL
                     await this.sendInvoiceWithPayUrl(
                         msg.chat.id,
@@ -222,7 +289,7 @@ export class Bot {
                         getRandomWallet(wallets),
                         msg.chat.id
                     );
-    
+
                 } catch (error) {
                     this.bot.sendMessage(msg.chat.id, "⚠️ An error occurred while processing your request. Please try again later.");
                     console.error("Error in processing purchase:", error);
@@ -233,43 +300,43 @@ export class Bot {
             }
         );
     }
-    
+
 
 
 
     private async productsCommand(msg: Message) {
         const products = await NOSQL.Product.find({});
-    
+
         // Define emoji buttons for products with discount
         const productButtons = products.map((product) => {
             // Check if the product has a discount
-            const discount = 0 ; // Assuming `product.discount` contains the discount percentage
-            const discountText = discount > 0 ? `🔥`: ''; // Add discount emoji and text if applicable
-    
+            const discount = 0; // Assuming `product.discount` contains the discount percentage
+            const discountText = discount > 0 ? `🔥` : ''; // Add discount emoji and text if applicable
+
             return {
-                text: `${ product.name } ⭐️ - $${product.price}${discountText}`,
+                text: `${product.name} ⭐️ - $${product.price}${discountText}`,
                 callback_data: `buy_${product._id}`,
             };
         });
-    
+
         // Define how many products per row (in this case, 1 product per row)
         const productsPerRow = 1;
-    
+
         // Divide the products into multiple rows dynamically
         const keyboardLayout = [];
         for (let i = 0; i < productButtons.length; i += productsPerRow) {
             keyboardLayout.push(productButtons.slice(i, i + productsPerRow));
         }
-    
+
         // Adding a title to the message to make it more informative
         const titleMessage = "<b> ⭐️ Buy Stars </b>";
-    
+
         // Define the "Back" button that will send users back to the main menu
-        
-    
+
+
         // Combine the product buttons with the back button at the bottom
         const fullKeyboardLayout = [...keyboardLayout, backButton];
-    
+
         // Send the message with the inline keyboard
         this.bot.sendMessage(msg.chat.id, titleMessage, {
             parse_mode: 'HTML', // Using HTML for formatting
@@ -278,7 +345,7 @@ export class Bot {
             },
         });
     }
-    
+
 
 
 
@@ -302,7 +369,7 @@ export class Bot {
         // Find or create the user
         let user = await NOSQL.User.findOne({ telegramId: String(userId) });
         if (!user) {
-            user =  new NOSQL.User({ telegramId: String(userId) });
+            user = new NOSQL.User({ telegramId: String(userId) });
 
             // Handle referrer logic if available
             if (referrerId) {
@@ -318,12 +385,12 @@ export class Bot {
         // Send welcome message and prompt for star purchase
         const welcomeMessage = `✨ Welcome!\n\nVia this bot you can purchase Telegram stars without KYC verification and cheaper than in the app.\n\n❗️Enter the number of stars you want to buy to continue (minimum: 50 stars):`;
         const sentMessage = await this.bot.sendMessage(msg.chat.id, welcomeMessage, {
-            reply_to_message_id : msg.message_id, reply_markup : { inline_keyboard :  [ [{ text: "⭐️ Buy Stars", callback_data: "view_products" } , backButton[0] ] ] , force_reply : true }
+            reply_to_message_id: msg.message_id, reply_markup: { inline_keyboard: [[{ text: "⭐️ Buy Stars", callback_data: "view_products" }, backButton[0]]], force_reply: true }
         });
 
 
-         // Listen for the reply to the message
-         const replyListener = this.bot.onReplyToMessage(
+        // Listen for the reply to the message
+        const replyListener = this.bot.onReplyToMessage(
             sentMessage.chat.id,
             sentMessage.message_id,
             async (reply) => {
@@ -349,11 +416,11 @@ export class Bot {
                 const user = await NOSQL.User.findOne({ telegramId: String(msg.from?.id) });
                 if (user) {
                     // Add purchase record to the user
-                    
+
                     await user.save();
 
                     // Send invoice with payment URL
-                    await this.sendInvoiceWithPayUrl( msg.chat.id,  msg.chat.username as string, stars, totalCost, 'TON', getRandomWallet(wallets), msg.chat.id );
+                    await this.sendInvoiceWithPayUrl(msg.chat.id, msg.chat.username as string, stars, totalCost, 'TON', getRandomWallet(wallets), msg.chat.id);
                 } else {
                     this.bot.sendMessage(msg.chat.id, '⚠️ You are not registered. Please restart the bot with /start.');
                 }
@@ -362,49 +429,93 @@ export class Bot {
                 this.bot.removeReplyListener(replyListener);
             }
         );
-       
+
+    }
+ 
+    private generateAffiliateMessage(affiliateLink: string, referrals: string, balance: number, totalEarned: number, minimumPayout: number) {
+        return `
+👥 *Affiliate Program*
+Invite people and get *10%* of our income *FOREVER*! 🎉
+
+🔗 *Your affiliate link:*
+[${affiliateLink}](${affiliateLink})
+
+📊 *Your links statistics:*
+- Referrals: *${referrals}* 👥
+- Balance: *${balance.toFixed(1)} TON* 💰
+- Total earned: *${totalEarned.toFixed(1)} TON* 🤑
+
+💸 *Minimum payout*: *${minimumPayout} TON*
+  `;
     }
 
+    
+    private sendAffiliateMessage(chatId: number, message: string) {
 
+        const withdrawButton = {
+            text: "💰 Withdraw", // Adding the emoji here
+            callback_data: "withdraw", // Action when the button is clicked
+        };
+
+        bot.sendMessage(chatId, message, {
+            parse_mode: 'Markdown',
+            disable_web_page_preview: true,
+            reply_markup : { inline_keyboard : [ [ withdrawButton , backButton[0]] ]}
+        }).catch((error) => {
+            console.error('Error sending message:', error.message);
+        });
+    }
 
     private async showMainMenu(msg: Message) {
-        const mainMenuKeyboard = [
+
+        const isAdminUser = isAdmin(msg.chat.id);
+        
+         
+        const mainMenuKeyboard: any[] = [
             [
                 { text: "🔑 User Account", callback_data: "user_account" },
                 { text: "⚙️ Settings", callback_data: "settings" },
             ],
             [
                 { text: "⭐️ Buy Stars", callback_data: "view_products" },
-                { text: "🧾 Invoice History", callback_data: "invoice_history" },  // Invoice History Button
+                { text: "🧾 Invoice History", callback_data: "invoice_history" },
             ],
-            backButton
+            [
+                { text: "🔗 Manage Affiliate Program", callback_data: "manage_affiliate_program" },
+            ],
         ];
-
-
-
-        // Send the main menu with the Invoice History option
+    
+        // Add the Admin Panel button only if the user is an admin
+        if (isAdminUser) {
+            mainMenuKeyboard.push([
+                { text: "🛠️ Admin Panel", callback_data: "admin_panel" },
+            ]);
+        }
+    
+        // Correctly define the backButton as a button object
+        const backButton = { text: "⬅️ Back", callback_data: "back" };
+    
+        // Always add the back button at the bottom
+        mainMenuKeyboard.push([backButton]);
+        
         this.bot.sendMessage(msg.chat.id, "Welcome to the Main Menu! Choose an option:", {
-         
             reply_markup: {
                 inline_keyboard: mainMenuKeyboard,
-            }
+            },
         });
     }
 
 
-
-
-
-
+ 
 
     private async showInvoiceHistory(msg: Message) {
         // Example invoice data (this can be fetched from a database)
         const invoices = await this.NOSQL.Invoice.find({ chatId: msg.chat.id });
-      
+
         // Create inline keyboard buttons for each invoice
         const invoiceKeyboard = invoices.map((invoice) => {
             let statusEmoji = '';
-            
+
             // Add emojis based on the invoice status
             switch (invoice.status) {
                 case 'paid':
@@ -419,27 +530,27 @@ export class Bot {
                 default:
                     statusEmoji = '⚪'; // Default (neutral) emoji
             }
-    
+
             return {
                 text: `🌟 ${invoice.quantity} ${statusEmoji}`,
                 callback_data: `invoice_${invoice.id}`,
             };
         });
-    
+
         // Add the back button
         const keyboard = [
             ...invoiceKeyboard, // Append the invoice buttons
-           
+
         ];
-    
+
         // Send the invoice list with buttons to the user
         this.bot.sendMessage(msg.chat.id, "Here is your invoice history:", {
             reply_markup: {
-                inline_keyboard: [keyboard  ,  backButton ], // Wrap the entire keyboard in an array
+                inline_keyboard: [keyboard, backButton], // Wrap the entire keyboard in an array
             },
         });
     }
-    
+
 
 
 
@@ -505,7 +616,7 @@ export class Bot {
         // Retrieve user data from your database or session
         const userId = msg.chat.id;  // Telegram user ID
         const user = await NOSQL.User.findOne({ telegramId: userId });
- 
+
         // If the user does not exist in the database
         if (!user) {
             this.bot.sendMessage(msg.chat.id, "Sorry, we couldn't find your account. Please register first.");
@@ -561,6 +672,16 @@ export class Bot {
     }
 
 
+    private async getAllStarPackages() {
+        try {
+            const starPackages = await this.NOSQL.Product.find(); // Fetch all star packages
+            return starPackages;
+        } catch (err) {
+            console.error('Error fetching star packages:', err);
+            return [];
+        }
+    }
+
     private async handleCallbackQuery(query: CallbackQuery) {
         const chatId = query.message?.chat.id;
         const data = query.data;
@@ -575,14 +696,14 @@ export class Bot {
             if (product) {
                 const user = await NOSQL.User.findOne({ telegramId: String(query.from.id) });
                 if (user) {
-                     
+
                     const amount = Number(product.name.split(' ')[0]);
                     const selectedWallet = getRandomWallet(wallets);
                     const tonPrice = await fetchTonPrice();
                     if (tonPrice === null) return;
-                    const ton = this.convertToTON(product.price , tonPrice as number)
+                    const ton = this.convertToTON(product.price, tonPrice as number)
 
-                    this.sendInvoiceWithPayUrl(chatId,msg?.chat.username,amount, ton ,'TON' , selectedWallet , chatId);
+                    this.sendInvoiceWithPayUrl(chatId, msg?.chat.username, amount, ton, 'TON', selectedWallet, chatId);
                 }
             }
         }
@@ -603,42 +724,63 @@ export class Bot {
 
         if (data.startsWith('invoice_')) {
             const invoiceId = data.split('_')[1];  // Extract invoice ID
-            await this.showInvoiceHistory(msg as any );
+            await this.showInvoiceHistory(msg as any);
         }
 
-        
-  
+
+
         if (data.startsWith('approve_')) {
             const txhash = data.split('_')[1];  // Extract invoice ID
-           
+
             const tx = await this.NOSQL.Transaction.findOne({ txhash });
-            if (!tx)  return;
+            if (!tx) return;
             await this.deleteMessage(msg as any);
             tx.status = 'paid';
             await tx.save()
-            bot.sendMessage(tx.payload, `✅ Your transfer of ⭐️ ${tx.quantity} to <a href="tg://user?id=${tx.payload}">${tx.payload}</a> has been approved.`, { parse_mode: 'HTML' , reply_markup : { inline_keyboard : [backButton]} });
-            await bot.sendMessage(chatId ,`✅ Request ID \`${tx.id}\` has been approved.` ,{ reply_markup : { inline_keyboard : [ backButton ]}});
+            bot.sendMessage(tx.payload, `✅ Your transfer of ⭐️ ${tx.quantity} to <a href="tg://user?id=${tx.payload}">${tx.payload}</a> has been approved.`, { parse_mode: 'HTML', reply_markup: { inline_keyboard: [backButton] } });
+            await bot.sendMessage(chatId, `✅ Request ID \`${tx.id}\` has been approved.`, { reply_markup: { inline_keyboard: [backButton] } });
         }
 
         if (data.startsWith('reject_')) {
             const txhash = data.split('_')[1];  // Extract invoice ID
-           
+
             const tx = await this.NOSQL.Transaction.findOne({ txhash });
-            if (!tx)  return;
+            if (!tx) return;
             tx.status = 'cancelled';
             await tx.save()
             await this.deleteMessage(msg as any);
-            await bot.sendMessage(tx.payload ,`❌ Request ID\`${tx.id}\` has been approved.` ,{ reply_markup : { inline_keyboard : [ backButton ]}});
-            await bot.sendMessage(chatId ,`❌ Request ID\`${tx.id}\` has been approved.` ,{ reply_markup : { inline_keyboard : [ backButton ]}});
+            await bot.sendMessage(tx.payload, `❌ Request ID\`${tx.id}\` has been approved.`, { reply_markup: { inline_keyboard: [backButton] } });
+            await bot.sendMessage(chatId, `❌ Request ID\`${tx.id}\` has been approved.`, { reply_markup: { inline_keyboard: [backButton] } });
         }
-  
-    } 
+
+
+        if (data === 'admin_panel') {
+            // Admin panel options (only shown to admins)
 
 
 
-    private async handleMessage (msg : Message){
-         // console.log(msg)
+            bot.sendMessage(chatId, 'Admin Panel: Choose an option', {
+                reply_markup: {
+                    inline_keyboard: adminOptions
+                }
+            });
+        }
+
+        if (data === 'manage_affiliate_program') {
+            await this.deleteMessage(msg as any);
+            const user = await this.NOSQL.User.findOne({ telegramId :  chatId });
+            if(!user) return;
+            const message = this.generateAffiliateMessage(`https://t.me/StarsovBot?start=${chatId}`,'100',user.balance ,user.balance,10);
+            this.sendAffiliateMessage(chatId,message)
+        }
+
+
+    }
+
+
+
+    private async handleMessage(msg: Message) {
+        // console.log(msg)
     }
 }
 
- 

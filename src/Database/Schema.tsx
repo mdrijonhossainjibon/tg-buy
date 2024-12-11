@@ -47,7 +47,7 @@ export  const InvoiceSchema = new Schema<IInvoice>({
  
 InvoiceSchema.pre('save', function (next) {
     if (!this.expires) {
-      this.expires = new Date(this.createdAt.getTime() + 30 * 60 * 1000); // 5 minutes from createdAt
+      this.expires = new Date(this.createdAt.getTime() + 5 * 60 * 1000); // 5 minutes from createdAt
     }
     if (this.productId) {
         const  productId  = crypto.randomBytes(5).toString('hex')
