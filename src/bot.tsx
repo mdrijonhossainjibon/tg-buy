@@ -31,7 +31,7 @@ const fetchTonPrice = async (): Promise<number | null> => {
         const price = parseFloat(response?.price as any);
          cache.set('TON_PRICE', price)
        
-        console.log('Fetched new TON price from Binance.');
+        console.log('Fetched new TON price from Binance.' , price);
         return price;
     } catch (error) {
         console.error('Error fetching TON price:', (error as Error).message);
